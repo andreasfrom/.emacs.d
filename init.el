@@ -44,6 +44,8 @@
 
 (exec-path-from-shell-initialize)
 
+;; (add-to-list 'load-path "~/.emacs.d/haskell-flycheck/")
+
 ;; configuration
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
@@ -55,6 +57,9 @@
       mouse-yank-at-point t
       save-place-file (concat user-emacs-directory "places")
       backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
+
+(setq user-mail-address "andro.from@gmail.com")
+(global-visual-line-mode)
 
 (delete-selection-mode 1)
 (column-number-mode 1)
@@ -116,6 +121,18 @@
 
 (helm-mode 1)
 
+;; org-mode
+(add-hook 'org-mode-hook
+	  (lambda ()
+	    (setq org-src-fontify-natively t)
+	    (setq org-latex-listings 'listings)
+	    (add-to-list 'org-latex-packages-alist '("" "listings"))))
+
+;; c
+(add-hook 'c-mode-hook
+	  (lambda ()
+	    (setq flycheck-clang-args '("-Wall" "-Wextra"))))
+
 ;; ace-jump-mode
 (global-set-key (kbd "C-o") 'ace-jump-word-mode)
 
@@ -135,7 +152,6 @@
 (setq company-idle-delay .2)
 (setq company-echo-delay 0)
 (setq company-require-match nil)
-(add-to-list 'company-backends 'company-ghc)
 
 ;; clojure
 (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
@@ -149,19 +165,31 @@
             (put-clojure-indent 'div 1)
             (put-clojure-indent 'span 1)))
 
-;; haskell
+;; haskell (requires starting Emacs from nix-shell)
+(setq haskell-process-type 'cabal-repl)
+(setq haskell-process-args-cabal-repl
+      '("--ghc-option=-ferror-spans" "--with-ghc=ghci-ng"))
+
+
+(setq haskell-stylish-on-save t)
+(setq haskell-process-suggest-remove-import-lines t)
+(setq haskell-process-auto-import-loaded-modules t)
+(setq haskell-process-log t)
+(setq haskell-process-reload-with-fbytecode nil)
+(setq haskell-interactive-mode-include-file-name nil)
+
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-(setq haskell-program-name "cabal repl")
-(setq haskell-stylish-on-save t)
+(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+(add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template)
+
+(add-hook 'interactive-haskell-mode-hook
+	  (lambda ()
+	    (define-key interactive-haskell-mode-map (kbd "C-c C-t") 'haskell-mode-show-type-at)
+	    (define-key interactive-haskell-mode-map (kbd "M-.") 'haskell-mode-goto-loc)))
 
 (eval-after-load 'flycheck
   '(add-hook 'flycheck-mode-hook #'flycheck-haskell-setup))
-
-;; ghc-mod
-(autoload 'ghc-init "ghc" nil t)
-(autoload 'ghc-debug "ghc" nil t)
-(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
 
 ;; flyspell
 (setq ispell-program-name "aspell")
@@ -237,7 +265,59 @@
  '(flycheck-haskell-runhaskell "runhaskell")
  '(purescript-mode-hook
    (quote
-    (capitalized-words-mode turn-on-eldoc-mode turn-on-purescript-indentation))))
+    (capitalized-words-mode turn-on-eldoc-mode turn-on-purescript-indentation)))
+ '(safe-local-variable-values
+   (quote
+    ((idris-packages "effects")
+     (eval add-to-list
+	   (quote face-remapping-alist)
+	   (quote
+	    (idris-loaded-region-face
+	     (:background nil))))
+     (eval add-to-list
+	   (quote face-remapping-alist)
+	   (quote
+	    (live-code-talks-comment-face
+	     (:slant normal :foreground "black" :family "Deja Vu Sans"))))
+     (eval add-to-list
+	   (quote face-remapping-alist)
+	   (quote
+	    (live-code-talks-subsubtitle-face
+	     (:height 1.3 :slant normal :foreground "black" :family "Deja Vu Sans"))))
+     (eval add-to-list
+	   (quote face-remapping-alist)
+	   (quote
+	    (live-code-talks-subtitle-face
+	     (:height 1.5 :slant normal :foreground "black" :family "Deja Vu Sans" :weight semibold))))
+     (eval add-to-list
+	   (quote face-remapping-alist)
+	   (quote
+	    (live-code-talks-title-face
+	     (:height 2.0 :slant normal :foreground "black" :family "Deja Vu Sans" :weight bold))))
+     (eval make-variable-buffer-local
+	   (quote face-remapping-alist))
+     (eval defun idris-talk-find-code-file
+	   (_b)
+	   (interactive)
+	   (find-file
+	    (expand-file-name "Lecture2Code.idr")))
+     (eval defun idris-talk-show-loc
+	   (_b)
+	   (interactive)
+	   (idris-info-for-name :print-definition "SourceLocation"))
+     (eval defun idris-talk-show-const2
+	   (_b)
+	   (interactive)
+	   (idris-info-for-name :print-definition "const2'"))
+     (eval defun idris-talk-show-less
+	   (_b)
+	   (interactive)
+	   (idris-info-for-name :print-definition "Less"))
+     (eval setq idris-metavariable-show-on-load nil)
+     (eval make-variable-buffer-local
+	   (quote idris-metavariable-show-on-load))
+     (eval require
+	   (quote custom))))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
