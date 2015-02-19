@@ -88,7 +88,7 @@
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (if (eq system-type 'darwin)
     (set-frame-font "Menlo 12")
-  (set-frame-font "Dejavu Sans Mono 12"))
+  (set-frame-font "Inconsolata 10"))
 
 ;; helm
 (require 'helm)
