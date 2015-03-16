@@ -131,7 +131,8 @@
 ;; c
 (add-hook 'c-mode-hook
 	  (lambda ()
-	    (setq flycheck-clang-args '("-Wall" "-Wextra"))))
+	    (setq flycheck-clang-warnings '("all" "extra" "everything"))
+	    (setq flycheck-clang-language-standard "c11")))
 
 ;; ace-jump-mode
 (global-set-key (kbd "C-o") 'ace-jump-word-mode)

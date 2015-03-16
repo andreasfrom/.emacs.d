@@ -3,6 +3,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+	LaTeX-insert-left-brace
 	TeX-insert-backslash
 	TeX-insert-quote
 	TeX-insert-sub-or-superscript
@@ -14,6 +15,7 @@
 	c-indent-line-or-region
 	electric-graphviz-dot-semi
 	electric-newline-and-maybe-indent
+	end-of-visual-line
 	haskell-indentation-delete-backward-char
 	haskell-indentation-delete-char
 	indent-for-tab-command
@@ -27,6 +29,7 @@
 	org-kill-line
 	org-return-indent
 	org-self-insert-command
+	paredit-backslash
 	paredit-doublequote
 	paredit-forward-delete
 	paredit-forward-slurp-sexp
